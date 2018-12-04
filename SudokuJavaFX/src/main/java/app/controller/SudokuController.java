@@ -46,6 +46,7 @@ import pkgEnum.ePuzzleViolation;
 import pkgGame.Cell;
 import pkgGame.Sudoku;
 import pkgHelper.PuzzleViolation;
+import javax.swing.*;
 
 public class SudokuController implements Initializable {
 
@@ -65,6 +66,8 @@ public class SudokuController implements Initializable {
 
 	private eGameDifficulty eGD = null;
 	private Sudoku s = null;
+
+	private Sudoku sTest = null;
 
 	public void setMainApp(Game game) {
 		this.game = game;
@@ -86,10 +89,36 @@ public class SudokuController implements Initializable {
 	private void btnStartGame(ActionEvent event) {
 		CreateSudokuInstance();
 		BuildGrids();
+		JOptionPane.showMessageDialog(null, "Instructions:\n"
+				+ "\tDrag numbers into the puzzle to set them.\n"
+				+ "\tDouble click to delete numbers from the puzzle.");
+	}
+
+	@FXML
+	private void btnEndGame(ActionEvent event) {
+		System.exit(0);
+	}
+
+	@FXML
+	private void btnCheckGame(ActionEvent event) {
+		if (s.isSudoku())
+			JOptionPane.showMessageDialog(null, "You win!");
+		else
+			JOptionPane.showMessageDialog(null, "You did not win yet.");
+
+		//s.PrintPuzzle();
+	}
+	
+	@FXML
+	private void btnInstructions(ActionEvent event) {
+		JOptionPane.showMessageDialog(null, "Instructions:\n"
+				+ "\tDrag numbers into the puzzle to set them.\n"
+				+ "\tDouble click to delete numbers from the puzzle.");
 	}
 
 	/**
-	 * CreateSudokuInstance - Create an instance of Sudoku, set the attribute in the 'Game' class
+	 * CreateSudokuInstance - Create an instance of Sudoku, set the attribute in the
+	 * 'Game' class
 	 * 
 	 * @version 1.5
 	 * @since Lab #5
@@ -98,10 +127,11 @@ public class SudokuController implements Initializable {
 	private void CreateSudokuInstance() {
 		eGD = this.game.geteGameDifficulty();
 		s = game.StartSudoku(this.game.getPuzzleSize(), eGD);
+		sTest = game.StartSudoku(this.game.getPuzzleSize(), eGD);
 	}
 
 	/**
-	 * BuildGrid - This method will bild all the grid objects (top/sudoku/numbers)
+	 * BuildGrid - This method will build all the grid objects (top/sudoku/numbers)
 	 * 
 	 * @version 1.5
 	 * @since Lab #5
@@ -130,7 +160,8 @@ public class SudokuController implements Initializable {
 	}
 
 	/**
-	 * BuildTopGrid - This is the grid at the top of the scene.  I'd stash 'difficulty', {@link #btnStartGame(ActionEvent)}of mistakes, etc
+	 * BuildTopGrid - This is the grid at the top of the scene. I'd stash
+	 * 'difficulty', {@link #btnStartGame(ActionEvent)}of mistakes, etc
 	 * 
 	 * @version 1.5
 	 * @since Lab #5
@@ -154,8 +185,9 @@ public class SudokuController implements Initializable {
 	}
 
 	/**
-	 * BuildNumbersGrid - This is the 'numbers' grid... a grid of the avaiable numbers based on the
-	 * flavor of the game.  If you're playing 4x4, you'll get numbers 1, 2, 3, 4.
+	 * BuildNumbersGrid - This is the 'numbers' grid... a grid of the available
+	 * numbers based on the flavor of the game. If you're playing 4x4, you'll get
+	 * numbers 1, 2, 3, 4.
 	 * 
 	 * @version 1.5
 	 * @since Lab #5
@@ -180,15 +212,17 @@ public class SudokuController implements Initializable {
 
 			// Set a event handler to fire if the pane was clicked
 			paneSource.setOnMouseClicked(e -> {
-				System.out.println(paneSource.getCell().getiCellValue());
+				// System.out.println(paneSource.getCell().getiCellValue());
 			});
 
 			// This is going to fire if the number from the number grid is dragged
 			// Find the cell in the pane, put it on the Dragboard
-			
-			//	Pay close attention... this is the method you must code to make your item draggable.
-			//	If you want a paneTarget draggable (so you can drag it into the trash), you'll have to 
-			//	implement a simliar method
+
+			// Pay close attention... this is the method you must code to make your item
+			// draggable.
+			// If you want a paneTarget draggable (so you can drag it into the trash),
+			// you'll have to
+			// implement a similar method
 			paneSource.setOnDragDetected(new EventHandler<MouseEvent>() {
 				public void handle(MouseEvent event) {
 
@@ -211,24 +245,33 @@ public class SudokuController implements Initializable {
 	}
 
 	/**
-	 * BuildSudokuGrid - This is the main Sudoku grid.  It cheats and uses SudokuStyler class to figure out the border
-	 *	widths.  There are also methods implemented for drag/drop.
+	 * BuildSudokuGrid - This is the main Sudoku grid. It cheats and uses
+	 * SudokuStyler class to figure out the border widths. There are also methods
+	 * implemented for drag/drop.
 	 *
-	 *	Example:
-	 *	paneTarget.setOnMouseClicked - fires if the user clicks a paneTarget cell
-	 *	paneTarget.setOnDragOver - fires if the user drags over a paneTarget cell
-	 *	paneTarget.setOnDragEntered - fires as the user enters the draggable cell
-	 *	paneTarget.setOnDragExited - fires as the user exits the draggable cell
-	 *	paneTarget.setOnDragDropped - fires after the user drops a draggable item onto the paneTarget
+	 * Example: paneTarget.setOnMouseClicked - fires if the user clicks a paneTarget
+	 * cell paneTarget.setOnDragOver - fires if the user drags over a paneTarget
+	 * cell paneTarget.setOnDragEntered - fires as the user enters the draggable
+	 * cell paneTarget.setOnDragExited - fires as the user exits the draggable cell
+	 * paneTarget.setOnDragDropped - fires after the user drops a draggable item
+	 * onto the paneTarget
 	 * 
 	 * @version 1.5
 	 * @since Lab #5
 	 * @param event
 	 */
-	
+
 	private GridPane BuildSudokuGrid() {
 
 		Sudoku s = this.game.getSudoku();
+
+		int[][] sTest = new int[s.getiSize()][s.getiSize()];
+
+		for (int i = 0; i < s.getiSize(); i++) {
+			for (int j = 0; j < s.getiSize(); j++) {
+				sTest[i][j] = s.getPuzzle()[i][j];
+			}
+		}
 
 		SudokuStyler ss = new SudokuStyler(s);
 		GridPane gridPaneSudoku = new GridPane();
@@ -257,7 +300,7 @@ public class SudokuController implements Initializable {
 				paneTarget.setStyle(ss.getStyle(new Cell(iRow, iCol))); // Set the styling.
 
 				paneTarget.setOnMouseClicked(e -> {
-					System.out.println(paneTarget.getCell().getiCellValue());
+					// System.out.println(paneTarget.getCell().getiCellValue());
 				});
 
 				// Fire this method as something is being dragged over a cell
@@ -295,6 +338,7 @@ public class SudokuController implements Initializable {
 					}
 				});
 
+				// removes red panes on exit
 				paneTarget.setOnDragExited(new EventHandler<DragEvent>() {
 					public void handle(DragEvent event) {
 						SudokuStyler.RemoveGridStyling(gridPaneSudoku);
@@ -313,33 +357,74 @@ public class SudokuController implements Initializable {
 						boolean success = false;
 						Cell CellTo = (Cell) paneTarget.getCell();
 
-						//TODO: This is where you'll find mistakes.  
-						//		Keep track of mistakes... as an attribute of Sudoku... start the attribute
-						//		at zero, and expose a AddMistake(int) method in Sudoku to add the mistake
-						//		write a getter so you can the value
-						//		Might even have a max mistake attribute in eGameDifficulty (easy has 2 mistakes, medium 4, etc)
-						//		If the number of mistakes >= max mistakes, end the game
+						// TODO: This is where you'll find mistakes.
+						// Keep track of mistakes... as an attribute of Sudoku... start the attribute
+						// at zero, and expose a AddMistake(int) method in Sudoku to add the mistake
+						// write a getter so you can the value
+						// Might even have a max mistake attribute in eGameDifficulty (easy has 2
+						// mistakes, medium 4, etc)
+						// If the number of mistakes >= max mistakes, end the game
 						if (db.hasContent(myFormat)) {
 							Cell CellFrom = (Cell) db.getContent(myFormat);
 
 							if (!s.isValidValue(CellTo.getiRow(), CellTo.getiCol(), CellFrom.getiCellValue())) {
 								if (game.getShowHints()) {
 
-								}
+									s.AddMistakes(1);
+									System.out.println(s.getiMistakes());
 
+									if (s.getiMistakes() >= s.getMaxMistakes()) {
+										JOptionPane.showMessageDialog(null, "SAD LOSER");
+										CreateSudokuInstance();
+										BuildGrids();
+									}
+								}
 							}
 
-							//	This is the code that is actually taking the cell value from the drag-from 
-							//	cell and dropping a new Image into the dragged-to cell
+							// This is the code that is actually taking the cell value from the drag-from
+							// cell and dropping a new Image into the dragged-to cell
 							ImageView iv = new ImageView(GetImage(CellFrom.getiCellValue()));
 							paneTarget.getCell().setiCellValue(CellFrom.getiCellValue());
 							paneTarget.getChildren().clear();
 							paneTarget.getChildren().add(iv);
-							System.out.println(CellFrom.getiCellValue());
+							// System.out.println(CellFrom.getiCellValue());
 							success = true;
+
+							// sets sudoku cell to that number you put in
+							s.getPuzzle()[CellTo.getiRow()][CellTo.getiCol()] = CellFrom.getiCellValue();
+
+							// checks if zeroes are left in the puzzle
+							if (s.getZeroes() == 0) {
+								if (s.isSudoku()) {
+									JOptionPane.showMessageDialog(null, "You win!");
+									CreateSudokuInstance();
+									BuildGrids();
+								} else {
+									JOptionPane.showMessageDialog(null, "You did not win yet.");
+								}
+							}
+
+							event.setDropCompleted(success);
+							event.consume();
 						}
-						event.setDropCompleted(success);
-						event.consume();
+					}
+				});
+				
+				// double click to delete numbers from puzzle
+				paneTarget.setOnMouseClicked(new EventHandler<MouseEvent>() {
+					@Override
+					public void handle(MouseEvent mouseEvent) {
+						if (sTest[paneTarget.getCell().getiRow()][paneTarget.getCell().getiCol()] == 0) {
+							
+							if (mouseEvent.getClickCount() == 2) {
+								paneTarget.getChildren().clear();
+								s.getPuzzle()[paneTarget.getCell().getiRow()][paneTarget.getCell().getiCol()] = 0;
+								sTest[paneTarget.getCell().getiRow()][paneTarget.getCell().getiCol()] = 0;
+								paneTarget.getCell().setiCellValue(0); 
+							
+							}
+							//mouseEvent.consume();
+						}
 					}
 				});
 
@@ -355,4 +440,5 @@ public class SudokuController implements Initializable {
 		InputStream is = getClass().getClassLoader().getResourceAsStream("img/" + iValue + ".png");
 		return new Image(is);
 	}
+
 }
